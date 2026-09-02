@@ -38,13 +38,14 @@
                 <select name="departemen_id" id="departemen_id" class="form-control form-select2">
                     <option value="">-- Pilih Departemen --</option>
                     <?php foreach ($departments as $d): ?>
-                        <option value="<?= $d->department_id ?>" <?= set_select('departemen_id', $d->department_id) ?>>
+                        <option value="<?= $d->department_id ?>">
                             <?= $d->department_name ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <small class="text-danger" id="error_departemen_id"></small>
+                <small class="text-danger" id="error_department_id"></small>
             </div>
+
             <div class="form-group col-md-6">
                 <label>Posisi <span class="text-danger">*</span></label>
                 <select name="position_id" id="position_id" class="form-control form-select2">
@@ -62,7 +63,7 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label>Sub Department</label>
-                <select name="sub_department_id" id="sub_department_id" class="form-control select2">
+                <select name="sub_department_id" id="sub_department_id" class="form-control form-select2">
                     <option value="">-- Pilih Department dulu --</option>
                 </select>
                 <small class="text-danger" id="error_sub_department_id"></small>
@@ -145,13 +146,21 @@
 <script>
 window.addEventListener('load', function () {
     $('.form-select2').select2({ theme: 'bootstrap4', width: '100%' });
-    $('#sub_department_id').prop('disabled', true).select2({
-        theme: 'bootstrap4',
-        width: '100%',
-        placeholder: '-- Pilih Sub Department --',
-        allowClear: true,
-        disabled: true
+
+    $('#sub_department_id').remoteChained({
+        parents: '#departemen_id',
+        url: '<?= base_url('employee/get_by_department/') ?>'
     });
+
+    // Fix supaya Select2 trigger change event dengan benar
+    $('#departemen_id').on('select2:select', function() {
+        $(this).trigger('change');
+    });
+
+    $('#sub_departemen_id').on('change', function() {
+        $(this).trigger('change.select2');
+    });
+    
 
     // ---- Format / Parse Money ----
     function formatMoney(v) {

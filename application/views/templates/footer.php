@@ -49,6 +49,11 @@
 
 <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
 
+<!-- jQuery Chained Remote (dependent/cascading dropdown via AJAX) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-chained/1.0.1/jquery.chained.remote.min.js"></script>
+
+<script src="https://cloudflare.com"></script>
+
 <?php
 if (isset($extra_script)) : ?>
   <script src="<?= base_url($extra_script) ?>"></script>

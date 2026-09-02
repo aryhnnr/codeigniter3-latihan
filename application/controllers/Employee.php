@@ -24,9 +24,27 @@ class Employee extends MY_Controller {
         $this->load->view('templates/footer');
     }
 
-    public function get_by_department($department_id){
-        $data = $this->Sub_department_model->get_by_department_id($department_id);
-        echo json_encode($data);
+    // public function get_by_department($department_id){
+    //     $data = $this->Sub_department_model->get_by_department_id($department_id);
+    //     echo json_encode($data);
+    // }
+
+    public function get_by_department(){
+        $department_id = $this->input->get('department_id');
+
+        $response = [
+            "" => "Pilih Sub Departemen"
+        ];
+
+        if (!empty($department_id)) {
+            $sub_departments = $this->Sub_department_model->get_by_department_id($department_id);
+            foreach ($sub_departments as $sub_department) {
+                $response[$sub_department->sub_department_id] = $sub_department->sub_department_name;
+            }
+        }
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
     }
 
     // Create — form tambah employee + akun user
