@@ -76,6 +76,36 @@ class Approve_model extends CI_Model{
         return $this->db->get()->result();
     }
 
+    public function get_approval_detail($approval_id){
+        $this->db->select('approval.*, menus.name as menu_name, product_status.product_status_name, users.username as created_by_name');
+        $this->db->from($this->table);
+        $this->db->join('product_status', 'product_status.product_status_id = approval.approval_status', 'left');
+        $this->db->join('users', 'users.user_id = approval.created_by', 'left');
+        $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
+        $this->db->where('approval.approval_id', $approval_id);
+        
+        $header = $this->db->get()->row();
+
+        if (!$header) {
+            return null;
+        }
+
+        $this->db->select('approval_detail.*, employees.employee_name, positions.position_name, departments.department_name, roles.name as role_name');
+        $this->db->from('approval_detail');
+        $this->db->join('employees', 'employees.employee_id = approval_detail.approval_user_id', 'left');
+        $this->db->join('positions', 'positions.position_id = employees.position_id', 'left');
+        $this->db->join('departments', 'departments.department_id = employees.department_id', 'left');
+        $this->db->join('roles', 'roles.id = approval_detail.approval_role_id', 'left');
+        $this->db->where('approval_detail.approval_id', $approval_id);
+        $this->db->order_by('approval_detail.approval_sequence', 'ASC');
+        $detail = $this->db->get()->result();
+
+        return (object) [
+            'header' => $header,
+            'detail' => $detail
+        ];
+    }
+
 
 
     public function get_menu(){

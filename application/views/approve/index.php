@@ -74,109 +74,6 @@
         </table>
     </div>
 </div>
-<!-- modal detail -->
-<!-- <div class="modal fade" id="modal-detail" tabindex="-1" role="dialog" aria-labelledby="modal-detail-label" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modal-detail-label"><i class="fas fa-info-circle mr-2"></i> Detail Purchase</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                 <div class="row">
-                    <div class="col-md-6 p-3">
-                        <div class="mb-3">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Code Purchase</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-code"></span>
-                        </div>
-                        <div class="mb-3">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Nama Supplier</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-name"></span>
-                        </div>
-                        <div class="mb-3">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Tanggal</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-purchase_date"></span>
-                        </div>
-                        <div class="mb-0">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Dibuat Oleh</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-create-by"></span>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 p-3">
-                        <div class="mb-3">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Tanggal Jatuh Tempo</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-due_date"></span>
-                        </div>
-                        <div class="mb-3">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Pembayaran</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-payment_type"></span>
-                        </div>
-                        <div class="mb-0">
-                            <strong class="d-block text-muted text-uppercase small mb-1">Status</strong>
-                            <span class="fs-5 fw-bold text-dark" id="detail-status"></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card table-responsive" id="detail-items">
-                    <table class="table table table-striped mb-0">
-                        <thead>
-                            <tr>
-                                <th>Produk</th>
-                                <th>Kuantitas</th>
-                                <th>Harga</th>
-                                <th>Subtotal</th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-items-body">
-                        </tbody>
-                    </table>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header bg-light py-2">
-                                <strong>Deskripsi</strong>
-                            </div>
-                            <div class="card-body py-2">
-                                <p id="detail-notes" class="text-justify mb-0"></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <table class="table table-borderless table-sm mb-0">
-                            <tr>
-                                <th class="text-muted">Subtotal</th>
-                                <td>:</td>
-                                <td id="detail-subtotal"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Discount</th>
-                                <td>:</td>
-                                <td id="detail-discount"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Pajak</th>
-                                <td>:</td>
-                                <td id="detail-tax"></td>
-                            </tr>
-                            <tr>
-                                <th class="text-muted">Grand Total</th>
-                                <td>:</td>
-                                <td id="detail-grand_total" class="font-weight-bold"></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-            </div>
-        </div>
-    </div>
-</div> -->
 
 <script>
 window.addEventListener('load', function () {
@@ -235,7 +132,17 @@ window.addEventListener('load', function () {
                 orderable: false,
                 searchable: false
             },
-            { data: 'approval_code' },
+            { 
+                data: null,
+                render: function(data, type, row) {
+                    return `
+                        <div>
+                            <a href="<?= base_url('approve/detail/') ?>${row.approval_id}" class="text-decoration-none">
+                                <strong>${row.approval_code || '-'}</strong>
+                        </div>
+                    `;
+                }
+            },
             { data: 'approval_name' },
             { data: 'approval_menu' },
             {
@@ -260,9 +167,6 @@ window.addEventListener('load', function () {
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     `;
-                        // <a href="javascript:void(0)" onclick="detailData(${row.purchase_id})" class="btn btn-sm btn-info">
-                        //     <i class="fas fa-eye"></i> Detail
-                        // </a>
                 }
             }
         ]

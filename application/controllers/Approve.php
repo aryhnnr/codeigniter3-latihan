@@ -128,7 +128,6 @@ class Approve extends MY_Controller {
 
         $this->db->trans_commit();
 
-        // Set flashdata untuk ditampilkan di halaman berikutnya
         $this->session->set_flashdata('success', 'Data approval berhasil disimpan');
 
         return $this->output
@@ -138,4 +137,65 @@ class Approve extends MY_Controller {
                 'message' => 'Data approval berhasil disimpan'
             ]));
     }
+
+    public function detail($approval_id)
+    {
+        $data['title'] = 'Detail Approval';
+        $approval_data = $this->Approve_model->get_approval_detail($approval_id);
+
+        if (!$approval_data) {
+            $this->session->set_flashdata('error', 'Data approval tidak ditemukan.');
+            redirect('approve');
+            return;
+        }
+
+        $data['approval'] = $approval_data->header;
+        $data['approval_users'] = $approval_data->detail;
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('approve/detail', $data);
+        $this->load->view('templates/footer');
+    }
+    public function get_detail($approval_id)
+    {
+        $approval = $this->Approve_model->get_approval_detail($approval_id);
+
+        if (!$approval) {
+            $this->session->set_flashdata('error', 'Data approval tidak ditemukan.');
+            redirect('approve');
+            return;
+        }
+
+        echo json_encode([
+            'header' => $approval->header,
+            'detail' => $approval->detail
+        ]);
+    }
+
+
+    public function edit($approval_id)
+    {
+        $data['title'] = 'Edit Approval';
+        $approval_data = $this->Approve_model->get_approval_detail($approval_id);
+
+        if (!$approval_data) {
+            $this->session->set_flashdata('error', 'Data approval tidak ditemukan.');
+            redirect('approve');
+            return;
+        }
+
+        $data['approval'] = $approval_data->header;
+        $data['approval_users'] = $approval_data->detail;
+        $data['statuses'] = $this->Approve_model->get_status();
+        $data['menus'] = $this->Approve_model->get_menu();
+        $data['employees'] = $this->Approve_model->get_employee();
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('approve/form', $data);
+        $this->load->view('templates/footer');
+    }
+    
+
+
+    
 }

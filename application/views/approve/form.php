@@ -75,7 +75,7 @@
                     <option value="<?= $e->employee_id ?>" 
                         data-jabatan="<?= $e->position_name ?>" 
                         data-divisi="<?= $e->department_name ?>">
-                        <?= $e->employee_name ?>
+                        <?= $e->employee_name ?> - <?= $e->position_name ?>
                     </option>
                 <?php endforeach; ?>
             </select>
