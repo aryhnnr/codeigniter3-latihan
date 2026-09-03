@@ -188,19 +188,40 @@ window.addEventListener('load', function () {
         refreshEmployeeOptions();
     });
 
+    // function validateForm() {
+    //     var isValid = true;
+
+    //     $('small.text-danger').text('');
+
+    //     if (!$('#approval_name').val().trim()) {
+    //         $('#error_approval_name').text('Nama approval wajib diisi.');
+    //         isValid = false;
+    //     }
+
+    //     if (!$('#approval_menu').val()) {
+    //         $('#error_approval_menu').text('Menu approval wajib dipilih.');
+    //         isValid = false;
+    //     }
+
+    //     if (!$('#approval_description').val().trim()) {
+    //         $('#error_approval_description').text('Deskripsi approval wajib diisi.');
+    //         isValid = false;
+    //     }
+
+    //     $('#wrapperDetail .employee-select').each(function() {
+    //         if (!$(this).val()) {
+    //             $(this).closest('.row-detail').find('.error-employee-select')
+    //                 .text('Employee wajib dipilih.');
+    //             isValid = false;
+    //         }
+    //     });
+
+    //     return isValid;
+    // }
+
     // Submit
     $('#formApproval').on('submit', function(e) {
         e.preventDefault();
-
-        var hasEmpty = false;
-        $('#wrapperDetail .employee-select').each(function() {
-            if (!$(this).val()) hasEmpty = true;
-        });
-
-        if (hasEmpty) {
-            Swal.fire('Gagal', 'Semua baris harus memilih employee.', 'error');
-            return;
-        }
 
         Swal.fire({
             title: 'Simpan Approval?',
@@ -215,8 +236,6 @@ window.addEventListener('load', function () {
                 return;
             }
 
-            $('small.text-danger').text('');
-
             $.ajax({
                 url: $('#formApproval').attr('action'),
                 method: 'POST',
@@ -228,15 +247,15 @@ window.addEventListener('load', function () {
                     } else if (res.errors && typeof res.errors === 'object') {
                         $.each(res.errors, function(fieldName, message) {
                             if (fieldName === 'approval_user_id') {
-                                $('#wrapperDetail').find('.error-employee-select').text(message);
+                                $('#wrapperDetail').find('.error-employee-select').first().text(message);
                             } else if (fieldName === 'general') {
-                                Swal.fire('Gagal', message, 'error');
+                                $('#wrapperDetail').find('.error-employee-select').first().text(message);
                             } else {
                                 $('#error_' + fieldName).text(message);
                             }
                         });
                     } else if (res.message) {
-                        Swal.fire('Gagal', res.message, 'error');
+                        $('#wrapperDetail').find('.error-employee-select').first().text(res.message);
                     }
                 },
                 error: function(xhr) {
@@ -245,15 +264,13 @@ window.addEventListener('load', function () {
                         if (res.errors && typeof res.errors === 'object') {
                             $.each(res.errors, function(fieldName, message) {
                                 if (fieldName === 'approval_user_id') {
-                                    $('#wrapperDetail').find('.error-employee-select').text(message);
+                                    $('#wrapperDetail').find('.error-employee-select').first().text(message);
                                 } else if (fieldName === 'general') {
-                                    Swal.fire('Gagal', message, 'error');
+                                    $('#wrapperDetail').find('.error-employee-select').first().text(message);
                                 } else {
                                     $('#error_' + fieldName).text(message);
                                 }
                             });
-                        } else if (res.message) {
-                            Swal.fire('Gagal', res.message, 'error');
                         }
                     } else {
                         Swal.fire('Gagal', 'Terjadi kesalahan pada server', 'error');

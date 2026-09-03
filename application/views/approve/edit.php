@@ -298,7 +298,8 @@ window.addEventListener('load', function () {
             showCancelButton: true,
             confirmButtonText: 'Ya, hapus',
             cancelButtonText: 'Batal',
-            confirmButtonColor: '#dc3545'
+            confirmButtonColor: '#dc3545',
+            reverseButtons: true,
         }).then(function(result) {
             if (!result.isConfirmed) return;
 
@@ -338,7 +339,8 @@ window.addEventListener('load', function () {
             icon: 'question',
             showCancelButton: true,
             confirmButtonText: 'Ya, simpan',
-            cancelButtonText: 'Batal'
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
         }).then(function(result) {
             if (!result.isConfirmed) return;
 

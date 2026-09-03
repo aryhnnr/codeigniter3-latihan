@@ -38,7 +38,7 @@ class Approve extends MY_Controller {
     {
         $this->form_validation->set_rules('approval_name', 'Nama Approval', 'required');
         $this->form_validation->set_rules('approval_menu', 'Menu', 'required|integer');
-        $this->form_validation->set_rules('approval_description', 'Deskripsi', 'required');
+        // $this->form_validation->set_rules('approval_description', 'Deskripsi', 'required');
         $this->form_validation->set_rules('approval_user_id[]', 'Employee', 'required');
 
         if ($this->form_validation->run() === FALSE) {
@@ -184,7 +184,7 @@ class Approve extends MY_Controller {
     public function update($approval_id) {
         $this->form_validation->set_rules('approval_name', 'Nama Approval', 'required');
         $this->form_validation->set_rules('approval_menu', 'Menu', 'required|integer');
-        $this->form_validation->set_rules('approval_description', 'Deskripsi', 'required');
+        // $this->form_validation->set_rules('approval_description', 'Deskripsi', 'required');
         $this->form_validation->set_rules('approval_status', 'Status Approval', 'required|integer');
 
         if ($this->form_validation->run() === FALSE) {
