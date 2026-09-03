@@ -10,10 +10,11 @@ class Approve_model extends CI_Model{
     }
 
     public function get_data(){
-        $this->db->select('approval.*, menus.name as approval_menu, product_status.product_status_name, users.username as created_by_name');
+        $this->db->select('approval.*, menus.name as approval_menu, product_status.product_status_name, users.username as created_by_name, updated_user.username as updated_by_name');
         $this->db->from($this->table);
         $this->db->join('product_status', "product_status.product_status_id = approval.approval_status AND product_status.module = 'product'", 'left');
         $this->db->join('users', 'users.user_id = approval.created_by', 'left');
+        $this->db->join('users as updated_user', 'updated_user.user_id = approval.updated_by', 'left');
         $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
         $this->db->order_by('approval.approval_id', 'DESC');
         return $this->db->get()->result();
@@ -126,10 +127,11 @@ class Approve_model extends CI_Model{
     }
 
     public function get_approval_detail($approval_id){
-        $this->db->select('approval.*, menus.name as menu_name, product_status.product_status_name, users.username as created_by_name');
+        $this->db->select('approval.*, menus.name as menu_name, product_status.product_status_name, users.username as created_by_name, updated_user.username as updated_by_name');
         $this->db->from($this->table);
         $this->db->join('product_status', "product_status.product_status_id = approval.approval_status AND product_status.module = 'product'", 'left');
         $this->db->join('users', 'users.user_id = approval.created_by', 'left');
+        $this->db->join('users as updated_user', 'updated_user.user_id = approval.updated_by', 'left');
         $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
         $this->db->where('approval.approval_id', $approval_id);
         

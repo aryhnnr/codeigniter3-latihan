@@ -75,6 +75,84 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-detail" tabindex="-1" role="dialog" aria-labelledby="modal-detail-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modal-detail-label"><i class="fas fa-info-circle mr-2"></i> Detail Approval</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                 <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Code Approval</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-code"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Nama Approval</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-name"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Pilihan Menu</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-menu"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Tanggal Dibuat</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-create-date"></span>
+                        </div>
+                        <div class="mb-0">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Dibuat Oleh</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-create-by"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Tanggal Diubah</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-update-date"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Diubah Oleh</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-update-by"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Status</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-status"></span>
+                        </div>
+                        <div class="mb-0">
+                            <strong class="d-block text-muted text-uppercase small mb-1">Deskripsi</strong>
+                            <span class="fs-5 fw-bold text-dark" id="detail-notes"></span>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Detail Items -->
+                <div class="card table-responsive" id="detail-items">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Sequence</th>
+                                <th>Nama Employee</th>
+                                <th>Jabatan</th>
+                                <th>Divisi</th>
+                                <th>Persetujuan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-items-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 window.addEventListener('load', function () {
     $('.select2').select2({
@@ -137,8 +215,9 @@ window.addEventListener('load', function () {
                 render: function(data, type, row) {
                     return `
                         <div>
-                            <a href="<?= base_url('approve/detail/') ?>${row.approval_id}" class="text-decoration-none">
-                                <strong>${row.approval_code || '-'}</strong>
+                            <button class="btn btn-sm btn-info btn-block" onclick="detailData(${row.approval_id})">
+                                <i class="fas fa-eye"></i> ${row.approval_code}
+                            </button>
                         </div>
                     `;
                 }
@@ -216,78 +295,64 @@ window.addEventListener('load', function () {
     //     }
     // });
 
+    function renderStatusBadge(statusName) {
+        const statusMap = {
+            'Aktif':      'badge-success',
+            'Nonaktif':   'badge-secondary',
+            'Tertunda':   'badge-secondary',
+            'Diproses':   'badge-warning',
+            'Diterima':   'badge-info',
+            'Selesai':    'badge-success',
+            'Dibatalkan': 'badge-danger',
+        };
+        const cssClass = statusMap[statusName] || 'badge-secondary';
+        return `<span class="badge ${cssClass}">${statusName || 'Unknown'}</span>`;
+    }
+
+    window.detailData = function(approvalId) {
+        $.ajax({
+            url: '<?= base_url('approve/get_detail') ?>/' + approvalId,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                const header = response.header;
+                const details = response.detail || [];
+
+                $('#detail-code').text(header.approval_code);
+                $('#detail-name').text(header.approval_name)
+                $('#detail-menu').text(header.menu_name);
+                $('#detail-create-date').text(header.created_at);
+                $('#detail-create-by').text(header.created_by_name);
+                $('#detail-update-date').text(header.updated_at || '-');
+                $('#detail-update-by').text(header.updated_by_name || '-');
+                $('#detail-status').html(renderStatusBadge(header.product_status_name));
+
+                const itemsBody = $('#detail-items-body');
+                itemsBody.empty();
+
+                details.forEach(item => {
+                    itemsBody.append(`
+                        <tr>
+                            <td>${item.approval_sequence || '-'}</td>
+                            <td>${item.employee_name || '-'}</td>
+                            <td>${item.position_name || '-'}</td>
+                            <td>${item.department_name || '-'}</td>
+                            <td>${item.approval_is_required == 1 ? 'Ya' : 'Tidak'}</td>
+                        </tr>
+                    `);
+                });
+                if (!details.length) {
+                    itemsBody.append('<tr><td colspan="5" class="text-center text-muted">Belum ada user approval.</td></tr>');
+                }
+                $('#detail-notes').text(header.approval_description || '-');
+
+                $('#modal-detail').modal('show');
+            },
+            error: function() {
+                alert('Gagal memuat detail approval.');
+            }
+        });
+    }
+
 });
-
-function renderStatusBadge(statusName) {
-    const statusMap = {
-        'Aktif':      'badge-success',
-        'Nonaktif':   'badge-secondary',
-        'Tertunda':   'badge-secondary',
-        'Diproses':   'badge-warning',
-        'Diterima':   'badge-info',
-        'Selesai':    'badge-success',
-        'Dibatalkan': 'badge-danger',
-    };
-    const cssClass = statusMap[statusName] || 'badge-secondary';
-    return `<span class="badge ${cssClass}">${statusName || 'Unknown'}</span>`;
-}
-
-// function detailData(purchaseId) {
-//     $.ajax({
-//         url: '<?= base_url('purchase/detail') ?>/' + purchaseId,
-//         type: 'GET',
-//         dataType: 'json',
-//         success: function(response) {
-//             const header = response.header;
-//             const details = response.details;
-
-//             function formatRupiah(number) {
-//                 return new Intl.NumberFormat('id-ID', {
-//                     style: 'currency',
-//                     currency: 'IDR',
-//                     minimumFractionDigits: 0
-//                 }).format(number);
-//             }
-
-//             $('#detail-code').text(header.purchase_code);
-//             $('#detail-name').text(header.nama_supplier);
-//             $('#detail-purchase_date').text(header.purchase_date);
-//             $('#detail-due_date').text(header.due_date);
-//             $('#detail-payment_type').text(header.payment_type);
-//             $('#detail-status').html(renderStatusBadge(header.product_status_name));
-
-//             const itemsBody = $('#detail-items-body');
-//             itemsBody.empty();
-
-//             let subtotalAll = 0;
-
-//             details.forEach(item => {
-//                 const qty = parseInt(item.qty);
-//                 const price = parseFloat(item.price);
-//                 const subtotal = qty * price;
-//                 subtotalAll += subtotal;
-
-//                 itemsBody.append(`
-//                     <tr>
-//                         <td>${item.product_name}</td>
-//                         <td>${qty}</td>
-//                         <td class="text-right">${formatRupiah(price)}</td>
-//                         <td class="text-right">${formatRupiah(subtotal)}</td>
-//                     </tr>
-//                 `);
-//             });
-
-//             $('#detail-subtotal').text(formatRupiah(subtotalAll));
-//             $('#detail-discount').text(formatRupiah(parseFloat(header.discount)));
-//             $('#detail-tax').text(formatRupiah(parseFloat(header.tax)));
-//             $('#detail-grand_total').text(formatRupiah(parseFloat(header.grand_total)));
-//             $('#detail-notes').text(header.notes || '-');
-
-//             $('#modal-detail').modal('show');
-//         },
-//         error: function() {
-//             alert('Gagal memuat detail purchase.');
-//         }
-//     });
-// }
 </script>

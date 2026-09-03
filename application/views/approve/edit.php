@@ -104,14 +104,14 @@
             <input type="text" class="form-control divisi-display" placeholder="Divisi" readonly>
         </div>
         <div class="col-md-2 text-center">
-            <label class="mb-1">Wajib</label>
+            <label class="mb-1">Persetujuan</label>
             <input type="checkbox" class="required-toggle row-input"
-                   data-toggle="toggle" data-on="Ya" data-off="Tidak"
+                   data-toggle="toggle" data-on="Wajib" data-off="Tidak"
                    data-onstyle="success" data-offstyle="secondary" data-size="sm" checked>
         </div>
         <div class="col-md-2 text-right">
             <button type="button" class="btn btn-success btn-sm btn-save-row" style="display:none;" title="Simpan baris ini">
-                <i class="fas fa-check"></i> Save
+                <i class="fas fa-check"></i>
             </button>
             <button type="button" class="btn btn-outline-danger btn-sm btn-remove-row" title="Hapus baris ini">
                 <i class="fas fa-trash"></i>

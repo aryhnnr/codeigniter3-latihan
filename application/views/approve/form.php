@@ -91,7 +91,7 @@
             <input type="text" class="form-control divisi-display" placeholder="Divisi" readonly>
         </div>
         <div class="col-md-2 text-center">
-            <label class="mb-1">Wajib</label>
+            <label class="mb-1">Persetujuan</label>
             <input type="checkbox" name="approval_is_required[]" class="required-toggle" 
                    data-toggle="toggle" data-on="Wajib" data-off="Tidak" 
                    data-onstyle="success" data-offstyle="secondary" data-size="sm" checked>
