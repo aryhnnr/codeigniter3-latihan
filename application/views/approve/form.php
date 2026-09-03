@@ -43,7 +43,7 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span><i class="fas fa-users"></i> Daftar User</span>
+            <span><i class="fas fa-users text-primary"></i> Daftar User</span>
             <button type="button" id="btnTambahRow" class="btn btn-primary btn-sm ml-auto">
                 <i class="fas fa-plus"></i> Tambah
             </button>
@@ -52,6 +52,9 @@
             <!-- Row akan di-generate oleh JS, mulai dengan 1 baris -->
         </div>
         <div class="card-footer text-right">
+            <a href="<?= base_url('approve') ?>" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </a>
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save"></i> Simpan
             </button>
@@ -81,7 +84,7 @@
             </select>
             <small class="text-danger error-employee-select d-block"></small>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <input type="text" class="form-control jabatan-display" placeholder="Jabatan" readonly>
         </div>
         <div class="col-md-2">
@@ -94,18 +97,21 @@
                    data-onstyle="success" data-offstyle="secondary" data-size="sm" checked>
             <!-- checkbox value 'on' otomatis terkirim kalau checked, kosong kalau tidak -->
         </div>
-        <div class="col-md-2 text-right">
+        <div class="col-md-1 text-right">
             <button type="button" class="btn btn-outline-danger btn-sm btn-remove-row">
                 <i class="fas fa-trash"></i>
             </button>
         </div>
     </div>
 </template>
-<script>
 
+<script>
 window.addEventListener('load', function () {
 
     $('.form-select2').select2({ theme: 'bootstrap4', width: '100%' });
+
+    var originalOptionsHtml = document.getElementById('rowTemplate').content
+        .querySelector('.employee-select').innerHTML;
 
     function addRow() {
         let template = document.getElementById('rowTemplate').content.cloneNode(true);
@@ -118,10 +124,11 @@ window.addEventListener('load', function () {
             width: '100%'
         });
 
-
         let totalRow = $('#wrapperDetail .row-detail').length;
         $lastRow.find('.sequence-input').val(totalRow);
         $lastRow.find('.required-toggle').bootstrapToggle();
+
+        refreshEmployeeOptions();
     }
 
     addRow();
@@ -134,6 +141,7 @@ window.addEventListener('load', function () {
         if ($('.row-detail').length > 1) {
             $(this).closest('.row-detail').remove();
             renumberSequence();
+            refreshEmployeeOptions();
         } else {
             Swal.fire('Info', 'Minimal harus ada 1 baris approval', 'info');
         }
@@ -145,20 +153,55 @@ window.addEventListener('load', function () {
         });
     }
 
-    // Auto-fill Jabatan & Divisi
+    function refreshEmployeeOptions() {
+        var usedIds = [];
+        $('#wrapperDetail .employee-select').each(function() {
+            var val = $(this).val();
+            if (val) usedIds.push(val);
+        });
+
+        $('#wrapperDetail .employee-select').each(function() {
+            var $select = $(this);
+            var currentValue = $select.val();
+
+            $select.find('option').each(function() {
+                var optionValue = $(this).val();
+                if (!optionValue) return;
+
+                var isUsedElsewhere = usedIds.includes(optionValue) && optionValue !== currentValue;
+                $(this).prop('disabled', isUsedElsewhere);
+            });
+
+            $select.trigger('change.select2');
+        });
+    }
+
     $('#wrapperDetail').on('change', '.employee-select', function() {
-        let selected = $(this).find('option:selected');
-        let $row = $(this).closest('.row-detail');
+        let $select = $(this);
+        let selected = $select.find('option:selected');
+        let $row = $select.closest('.row-detail');
 
         $row.find('.jabatan-display').val(selected.data('jabatan') || '');
         $row.find('.divisi-display').val(selected.data('divisi') || '');
+        $row.find('.error-employee-select').text('');
+
+        refreshEmployeeOptions();
     });
 
     // Submit
     $('#formApproval').on('submit', function(e) {
         e.preventDefault();
 
-        // Confirmation alert
+        var hasEmpty = false;
+        $('#wrapperDetail .employee-select').each(function() {
+            if (!$(this).val()) hasEmpty = true;
+        });
+
+        if (hasEmpty) {
+            Swal.fire('Gagal', 'Semua baris harus memilih employee.', 'error');
+            return;
+        }
+
         Swal.fire({
             title: 'Simpan Approval?',
             text: 'Pastikan data approval dan employee sudah benar.',
@@ -172,7 +215,6 @@ window.addEventListener('load', function () {
                 return;
             }
 
-            // Clear semua error dulu
             $('small.text-danger').text('');
 
             $.ajax({
@@ -182,29 +224,32 @@ window.addEventListener('load', function () {
                 dataType: 'json',
                 success: function(res) {
                     if (res.status === 'success') {
-                        // Langsung redirect, flashdata akan tampil di halaman berikutnya
                         window.location.href = '<?= base_url("approve") ?>';
+                    } else if (res.errors && typeof res.errors === 'object') {
+                        $.each(res.errors, function(fieldName, message) {
+                            if (fieldName === 'approval_user_id') {
+                                $('#wrapperDetail').find('.error-employee-select').text(message);
+                            } else if (fieldName === 'general') {
+                                Swal.fire('Gagal', message, 'error');
+                            } else {
+                                $('#error_' + fieldName).text(message);
+                            }
+                        });
+                    } else if (res.message) {
+                        Swal.fire('Gagal', res.message, 'error');
                     }
                 },
                 error: function(xhr) {
-                    if (xhr.status === 422) {
+                    if (xhr.status === 422 && xhr.responseJSON) {
                         let res = xhr.responseJSON;
-                        
-                        // Tampilkan error per field
                         if (res.errors && typeof res.errors === 'object') {
                             $.each(res.errors, function(fieldName, message) {
-                                // Handle array field like approval_user_id
                                 if (fieldName === 'approval_user_id') {
-                                    // Tampilkan error di semua row
                                     $('#wrapperDetail').find('.error-employee-select').text(message);
                                 } else if (fieldName === 'general') {
-                                    // Error general, tampilkan di sweet alert
                                     Swal.fire('Gagal', message, 'error');
                                 } else {
-                                    let $errorElement = $(`#error_${fieldName}`);
-                                    if ($errorElement.length) {
-                                        $errorElement.text(message);
-                                    }
+                                    $('#error_' + fieldName).text(message);
                                 }
                             });
                         } else if (res.message) {

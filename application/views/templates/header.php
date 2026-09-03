@@ -59,7 +59,17 @@
         height: 36px !important;
         right: 6px !important;
     }
+
+    .select2-container--default .select2-results__option--disabled,
+    .select2-container--bootstrap4 .select2-results__option--disabled,
+    .select2-results__option[aria-disabled="true"] {
+        background-color: #f8d7da !important;
+        color: #721c24 !important;
+        font-style: italic;
+        cursor: not-allowed !important;
+    }
   </style>
+  
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">

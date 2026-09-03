@@ -12,7 +12,7 @@ class Approve_model extends CI_Model{
     public function get_data(){
         $this->db->select('approval.*, menus.name as approval_menu, product_status.product_status_name, users.username as created_by_name');
         $this->db->from($this->table);
-        $this->db->join('product_status', 'product_status.product_status_id = approval.approval_status', 'left');
+        $this->db->join('product_status', "product_status.product_status_id = approval.approval_status AND product_status.module = 'product'", 'left');
         $this->db->join('users', 'users.user_id = approval.created_by', 'left');
         $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
         $this->db->order_by('approval.approval_id', 'DESC');
@@ -22,7 +22,7 @@ class Approve_model extends CI_Model{
     public function get_by_id($id){
         $this->db->select('approval.*, menus.name as approval_menu, product_status.product_status_name, users.username as created_by_name');
         $this->db->from($this->table);
-        $this->db->join('product_status', 'product_status.product_status_id = approval.approval_status', 'left');
+        $this->db->join('product_status', "product_status.product_status_id = approval.approval_status AND product_status.module = 'product'", 'left');
         $this->db->join('users', 'users.user_id = approval.created_by', 'left');
         $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
         $this->db->where('approval.approval_id', $id);
@@ -30,8 +30,30 @@ class Approve_model extends CI_Model{
     }
 
     public function get_status(){
+        $this->db->order_by('product_status_id', 'ASC');
         $this->db->where('module', 'product');
         return $this->db->get('product_status')->result();
+    }
+
+    public function status_exists($status_id){
+        return $this->db
+            ->where('product_status_id', $status_id)
+            ->where('module', 'product')
+            ->count_all_results('product_status') > 0;
+    }
+
+    public function get_active_status_id(){
+        $statuses = $this->get_status();
+
+        foreach ($statuses as $status) {
+            $status_name = strtolower(trim($status->product_status_name));
+            if (strpos($status_name, 'nonaktif') === false && strpos($status_name, 'inactive') === false &&
+                (strpos($status_name, 'aktif') !== false || strpos($status_name, 'active') !== false)) {
+                return $status->product_status_id;
+            }
+        }
+
+        return $statuses[0]->product_status_id ?? null;
     }
 
     public function generate_approval_code(){
@@ -66,6 +88,33 @@ class Approve_model extends CI_Model{
         $this->db->insert_batch('approval_detail', $data);
     }
 
+    public function update_header($id, $data)
+    {
+        $this->db->where('approval_id', $id);
+        $this->db->update('approval', $data);
+    }
+
+    public function update_detail($approval_id, $data)
+    {
+        $this->db->where('approval_id', $approval_id);
+        $this->db->update_batch('approval_detail', $data, 'approval_detail_id');
+    }
+
+    public function insert_single_detail($data) {
+        $this->db->insert('approval_detail', $data);
+        return $this->db->insert_id();
+    }
+
+    public function update_single_detail($id, $data) {
+        $this->db->where('approval_detail_id', $id);
+        return $this->db->update('approval_detail', $data);
+    }
+
+    public function delete_single_detail($id) {
+        $this->db->where('approval_detail_id', $id);
+        return $this->db->delete('approval_detail');
+    }
+
     public function get_approval_items($approval_id){
         $this->db->select('approval_detail.*, roles.name as role_name, users.username as user_name');
         $this->db->from('approval_detail');
@@ -79,7 +128,7 @@ class Approve_model extends CI_Model{
     public function get_approval_detail($approval_id){
         $this->db->select('approval.*, menus.name as menu_name, product_status.product_status_name, users.username as created_by_name');
         $this->db->from($this->table);
-        $this->db->join('product_status', 'product_status.product_status_id = approval.approval_status', 'left');
+        $this->db->join('product_status', "product_status.product_status_id = approval.approval_status AND product_status.module = 'product'", 'left');
         $this->db->join('users', 'users.user_id = approval.created_by', 'left');
         $this->db->join('menus', 'menus.id = approval.approval_menu', 'left');
         $this->db->where('approval.approval_id', $approval_id);
@@ -104,6 +153,18 @@ class Approve_model extends CI_Model{
             'header' => $header,
             'detail' => $detail
         ];
+    }
+
+    public function is_user_already_used($approval_id, $user_id, $exclude_detail_id = null) {
+        $this->db->where('approval_id', $approval_id);
+        $this->db->where('approval_user_id', $user_id);
+
+        if (!empty($exclude_detail_id)) {
+            $this->db->where('approval_detail_id !=', $exclude_detail_id);
+        }
+
+        $query = $this->db->get('approval_detail');
+        return $query->num_rows() > 0;
     }
 
 

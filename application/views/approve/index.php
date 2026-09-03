@@ -160,10 +160,10 @@ window.addEventListener('load', function () {
                 render: function (data, type, row) {
                     return `
 
-                        <a href="<?= base_url('purchase/edit/') ?>${row.purchase_id}" class="btn btn-sm btn-warning">
+                        <a href="<?= base_url('approve/edit/') ?>${row.approval_id}" class="btn btn-sm btn-warning">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="${row.purchase_id}" data-code="${row.purchase_code}">
+                        <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="${row.approval_id}" data-code="${row.approval_code}">
                             <i class="fas fa-trash"></i> Hapus
                         </button>
                     `;
