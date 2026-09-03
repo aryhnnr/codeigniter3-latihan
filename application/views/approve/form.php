@@ -75,7 +75,7 @@
             <select name="approval_user_id[]" class="form-control employee-select">
                 <option value="">-- Pilih Employee --</option>
                 <?php foreach ($employees as $e): ?>
-                    <option value="<?= $e->employee_id ?>" 
+                                <option value="<?= $e->user_id ?>" 
                         data-jabatan="<?= $e->position_name ?>" 
                         data-divisi="<?= $e->department_name ?>">
                         <?= $e->employee_name ?> - <?= $e->position_name ?>
@@ -84,13 +84,13 @@
             </select>
             <small class="text-danger error-employee-select d-block"></small>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <input type="text" class="form-control jabatan-display" placeholder="Jabatan" readonly>
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control divisi-display" placeholder="Divisi" readonly>
         </div>
-        <div class="col-md-2 text-center">
+        <div class="col-md-3 text-center">
             <label class="mb-1">Persetujuan</label>
             <input type="checkbox" name="approval_is_required[]" class="required-toggle" 
                    data-toggle="toggle" data-on="Wajib" data-off="Tidak" 

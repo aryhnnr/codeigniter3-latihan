@@ -88,7 +88,7 @@
             <select class="form-control employee-select row-input">
                 <option value="">-- Pilih Employee --</option>
                 <?php foreach ($employees as $e): ?>
-                    <option value="<?= $e->employee_id ?>"
+                    <option value="<?= $e->user_id ?>"
                         data-jabatan="<?= $e->position_name ?>"
                         data-divisi="<?= $e->department_name ?>">
                         <?= $e->employee_name ?> - <?= $e->position_name ?>
@@ -103,13 +103,13 @@
         <div class="col-md-2">
             <input type="text" class="form-control divisi-display" placeholder="Divisi" readonly>
         </div>
-        <div class="col-md-2 text-center">
+        <div class="col-md-3 text-center">
             <label class="mb-1">Persetujuan</label>
             <input type="checkbox" class="required-toggle row-input"
                    data-toggle="toggle" data-on="Wajib" data-off="Tidak"
                    data-onstyle="success" data-offstyle="secondary" data-size="sm" checked>
         </div>
-        <div class="col-md-2 text-right">
+        <div class="col-md-1 text-right">
             <button type="button" class="btn btn-success btn-sm btn-save-row" style="display:none;" title="Simpan baris ini">
                 <i class="fas fa-check"></i>
             </button>

@@ -71,7 +71,11 @@
             <?php foreach ($tickets as $t) : ?>
             <tr>
                 <td><?= $no++ ?></td>
-                <td><?= $t->ticket_number ?></td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-info btn-detail" data-id="<?= $t->id ?>">
+                        <i class="fas fa-eye"></i> <?= $t->ticket_number ?>
+                    </button>
+                </td>
                 <td><?= $t->nama_pemohon ?></td>
                 <td><?= $t->department_name ?></td>
                 <td><?= $t->judul ?></td>
@@ -88,7 +92,7 @@
                 <td><?= $t->teknisi_name ? $t->teknisi_name : '-' ?></td>
                 <td><?= $t->created_by_username ? $t->created_by_username : '-' ?></td>
                 <td class="d-flex flex-wrap">
-                    <button type="button" class="btn btn-sm btn-info mb-2 mr-2 btn-detail" data-id="<?= $t->id ?>"><i class="fas fa-eye"></i> Detail</button>
+                    <!-- <button type="button" class="btn btn-sm btn-info mb-2 mr-2 btn-detail" data-id="<?= $t->id ?>"><i class="fas fa-eye"></i> Detail</button> -->
                     <?php if ($t->status == 'OPEN' || $t->status == 'IN PROGRESS') : ?>
                         <a href="<?= base_url('ticket/edit/' . $t->id) ?>"
                         class="btn btn-sm btn-warning mb-2 mr-2">
@@ -437,7 +441,11 @@ window.addEventListener('load', function () {
                         html += `
                             <tr>
                                 <td>${i + 1}</td>
-                                <td>${t.ticket_number}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info btn-detail" data-id="${t.id}">
+                                        <i class="fas fa-eye"></i> ${t.ticket_number}
+                                    </button>
+                                </td>
                                 <td>${t.nama_pemohon}</td>
                                 <td>${t.department_name}</td>
                                 <td>${t.judul}</td>
@@ -446,7 +454,6 @@ window.addEventListener('load', function () {
                                 <td>${t.teknisi_name ? t.teknisi_name : '-'}</td>
                                 <td>${t.created_by_username ? t.created_by_username : '-'}</td>
                                 <td class="d-flex flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-info btn-detail mr-2 mb-2" data-id="${t.id}"><i class="fas fa-eye"></i> Detail</button>
                                     ${(t.status === 'OPEN' || t.status === 'IN PROGRESS') ? `<a href="<?= base_url('ticket/edit/') ?>${t.id}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>` : ''}
                                 </td>
                             </tr>

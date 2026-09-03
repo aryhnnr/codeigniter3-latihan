@@ -130,11 +130,11 @@
                     </div>
                 </div>
                 <!-- Detail Items -->
-                <div class="card table-responsive" id="detail-items">
-                    <table class="table table-striped mb-0">
+                <div class="card shadow-none table-responsive" id="detail-items">
+                    <table class="table table-striped mb-0 border">
                         <thead>
                             <tr>
-                                <th>Sequence</th>
+                                <th>Urutan</th>
                                 <th>Nama Employee</th>
                                 <th>Jabatan</th>
                                 <th>Divisi</th>
@@ -231,7 +231,14 @@ window.addEventListener('load', function () {
                 }
             },
             { data: 'created_by_name' },
-            { data: 'created_at' },
+            {
+                data: 'created_at',
+                render: function(data) {
+                    if (!data) return '-';
+
+                    return data.substring(0, 10);
+                }
+            },
             {
                 data: null,
                 orderable: false,

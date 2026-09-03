@@ -121,6 +121,7 @@ class Approve_model extends CI_Model{
         $this->db->from('approval_detail');
         $this->db->join('roles', 'roles.id = approval_detail.approval_role_id', 'left');
         $this->db->join('users', 'users.user_id = approval_detail.approval_user_id', 'left');
+        $this->db->join('employees', 'employees.employee_id = users.employee_id', 'left');
         $this->db->where('approval_detail.approval_id', $approval_id);
         $this->db->order_by('approval_detail.approval_sequence', 'ASC');
         return $this->db->get()->result();
@@ -143,7 +144,8 @@ class Approve_model extends CI_Model{
 
         $this->db->select('approval_detail.*, employees.employee_name, positions.position_name, departments.department_name, roles.name as role_name');
         $this->db->from('approval_detail');
-        $this->db->join('employees', 'employees.employee_id = approval_detail.approval_user_id', 'left');
+        $this->db->join('users as approval_users', 'approval_users.user_id = approval_detail.approval_user_id', 'left');
+        $this->db->join('employees', 'employees.employee_id = approval_users.employee_id', 'left');
         $this->db->join('positions', 'positions.position_id = employees.position_id', 'left');
         $this->db->join('departments', 'departments.department_id = employees.department_id', 'left');
         $this->db->join('roles', 'roles.id = approval_detail.approval_role_id', 'left');
@@ -181,13 +183,51 @@ class Approve_model extends CI_Model{
         return $this->db->get()->result();
     }
 
-    public function get_employee(){
-        $this->db->select('employees.employee_id, employees.employee_name , positions.position_name, departments.department_name');
+    // public function get_employee(){
+    //     $this->db->select('employees.employee_id, employees.employee_name , positions.position_name, departments.department_name');
+    //     $this->db->from('employees');
+    //     $this->db->join('positions', 'positions.position_id = employees.position_id', 'left');
+    //     $this->db->join('departments', 'departments.department_id = employees.department_id', 'left');
+    //     $this->db->where('employees.status', 1);
+    //     $this->db->order_by('employees.employee_name', 'ASC');
+    //     return $this->db->get()->result();
+    // }
+
+    public function get_employee()
+    {
+        $this->db->select('
+            users.user_id,
+            employees.employee_id,
+            employees.employee_name,
+            positions.position_name,
+            departments.department_name
+        ');
+
         $this->db->from('employees');
-        $this->db->join('positions', 'positions.position_id = employees.position_id', 'left');
-        $this->db->join('departments', 'departments.department_id = employees.department_id', 'left');
+
+        $this->db->join(
+            'positions',
+            'positions.position_id = employees.position_id',
+            'left'
+        );
+
+        $this->db->join(
+            'departments',
+            'departments.department_id = employees.department_id',
+            'left'
+        );
+
+        // Hanya employee yang memiliki user
+        $this->db->join(
+            'users',
+            'users.employee_id = employees.employee_id',
+            'inner'
+        );
+
         $this->db->where('employees.status', 1);
+
         $this->db->order_by('employees.employee_name', 'ASC');
+
         return $this->db->get()->result();
     }
 }
