@@ -230,4 +230,12 @@ class Approve_model extends CI_Model{
 
         return $this->db->get()->result();
     }
+
+    public function get_approval_code($approval_id) {
+        $this->db->select('approval_code');
+        $this->db->from($this->table);
+        $this->db->where('approval_id', $approval_id);
+        $query = $this->db->get();
+        return $query->row() ? $query->row()->approval_code : null;
+    }
 }

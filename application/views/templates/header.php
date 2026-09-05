@@ -201,7 +201,9 @@
                     title: 'Sukses!',
                     text: '<?= $this->session->flashdata('success'); ?>',
                     icon: 'success',
-                    confirmButtonText: 'OK'
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true
                 });
             </script>
         <?php endif; ?>
@@ -212,7 +214,9 @@
                     title: 'Gagal!',
                     text: '<?= $this->session->flashdata('error'); ?>',
                     icon: 'error',
-                    confirmButtonText: 'OK'
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true
                 });
             </script>
         <?php endif; ?>

@@ -128,13 +128,17 @@ class Approve extends MY_Controller {
 
         $this->db->trans_commit();
 
-        $this->session->set_flashdata('success', 'Data approval berhasil disimpan');
+        $code = $this->Approve_model->generate_approval_code();
+
+        $this->session->set_flashdata('success', 'Data approval ' . $code . ' berhasil disimpan');
+
+        
 
         return $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode([
                 'status' => 'success',
-                'message' => 'Data approval berhasil disimpan'
+                'message' => 'Data approval ' . $code . ' berhasil disimpan'
             ]));
     }
 
@@ -222,11 +226,13 @@ class Approve extends MY_Controller {
 
         $this->Approve_model->update_header($approval_id, $header_approval);
 
-        $this->session->set_flashdata('success', 'Data approval berhasil diperbarui');
+        $code = $this->Approve_model->get_approval_code($approval_id);
+
+        $this->session->set_flashdata('success', 'Data approval ' . $code . ' berhasil diperbarui');
 
         echo json_encode([
             'status'  => 'success',
-            'message' => 'Data approval berhasil diperbarui'
+            'message' => 'Data approval ' . $code . ' berhasil diperbarui'
         ]);
     }
     public function save_detail() {
